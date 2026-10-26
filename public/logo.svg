@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" fill="none">
+  <!-- Minimalist False Nine Emblem -->
+  <rect x="2" y="2" width="76" height="76" rx="4" stroke="#0A0A0A" stroke-width="3" fill="#FFFFFF"/>
+  <!-- Jersey Collar / Shield geometry -->
+  <path d="M28 20L40 32L52 20" stroke="#0A0A0A" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Minimalist bold '9' -->
+  <path d="M48 36C48 30.5 44 26 38 26C32.5 26 28 30.5 28 36C28 41.5 32.5 46 38 46C44 46 48 41.5 48 36ZM48 36V56C48 60 44 62 38 62" stroke="#0A0A0A" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>

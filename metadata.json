@@ -1,0 +1,6 @@
+{
+  "name": "False Nine – Review QR App",
+  "description": "Mobile-first instant Google Review generator and printable QR table stand for False Nine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
