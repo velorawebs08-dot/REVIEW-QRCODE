@@ -33,7 +33,7 @@ export const ContactButtons: React.FC = () => {
           href={instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="min-h-[44px] px-3 py-2.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#0A0A0A] border border-[#0A0A0A] rounded-[2px] text-xs font-semibold uppercase tracking-wider font-heading flex items-center justify-center gap-2 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="min-h-[44px] px-3 py-2.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#0A0A0A] border border-[#0A0A0A] rounded-[2px] text-xs font-semibold uppercase tracking-wider font-heading flex items-center justify-center gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-2"
         >
           <Instagram className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span className="truncate">FOLLOW ON INSTAGRAM</span>
@@ -43,7 +43,7 @@ export const ContactButtons: React.FC = () => {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="min-h-[44px] px-3 py-2.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#0A0A0A] border border-[#0A0A0A] rounded-[2px] text-xs font-semibold uppercase tracking-wider font-heading flex items-center justify-center gap-2 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="min-h-[44px] px-3 py-2.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#0A0A0A] border border-[#0A0A0A] rounded-[2px] text-xs font-semibold uppercase tracking-wider font-heading flex items-center justify-center gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-2"
         >
           <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span className="truncate">CHAT ON WHATSAPP</span>
@@ -56,7 +56,7 @@ export const ContactButtons: React.FC = () => {
           {phoneUrl && (
             <a
               href={phoneUrl}
-              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-black"
+              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A]"
             >
               <Phone className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Call ({siteData.business.name})</span>
@@ -68,7 +68,7 @@ export const ContactButtons: React.FC = () => {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-black"
+              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A]"
             >
               <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Directions</span>
@@ -80,7 +80,7 @@ export const ContactButtons: React.FC = () => {
               href={websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-black"
+              className="min-h-[40px] px-3 py-1.5 bg-[#FFFFFF] hover:bg-[#F5F5F4] text-[#737373] hover:text-[#0A0A0A] border border-[#E5E5E5] rounded-[2px] text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A]"
             >
               <Globe className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Official Website</span>

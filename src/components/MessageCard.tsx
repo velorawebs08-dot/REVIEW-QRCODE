@@ -53,11 +53,11 @@ export const MessageCard: React.FC<MessageCardProps> = ({
             type="button"
             onClick={handleCopy}
             aria-label={isCopied ? "Message copied" : `Copy review: ${message}`}
-            className={`min-h-[44px] min-w-[104px] px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-[2px] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-1 active:scale-[0.98] ${
-              isCopied
-                ? 'bg-[#0A0A0A] text-[#FFFFFF]'
-                : 'bg-[#0A0A0A] text-[#FFFFFF] hover:bg-black/85'
-            }`}
+            className={`min-h-[44px] min-w-[104px] px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-[2px] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-2 active:scale-[0.98] ${
+                isCopied
+                  ? 'bg-[#0A0A0A] text-[#FFFFFF]'
+                  : 'bg-[#0A0A0A] text-[#FFFFFF] hover:bg-black/85'
+              }`}
           >
             {isCopied ? (
               <>

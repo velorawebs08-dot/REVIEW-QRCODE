@@ -28,7 +28,7 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
               aria-selected={isSelected}
               aria-pressed={isSelected}
               onClick={() => onSelectCategory(cat.id)}
-              className={`min-h-[44px] px-4 py-2 text-sm font-medium whitespace-nowrap shrink-0 transition-colors duration-150 rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
+              className={`min-h-[44px] px-4 py-2 text-sm font-medium whitespace-nowrap shrink-0 transition-colors duration-150 rounded-[2px] outline-none focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-2 ${
                 isSelected
                   ? 'bg-[#0A0A0A] text-[#FFFFFF] border border-[#0A0A0A]'
                   : 'bg-[#FFFFFF] text-[#0A0A0A] border border-[#0A0A0A] hover:bg-[#F5F5F4]'

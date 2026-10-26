@@ -107,7 +107,7 @@ export const ReviewNotepad: React.FC<ReviewNotepadProps> = ({
             type="button"
             onClick={handleCopyNotepad}
             aria-label="Copy review notepad text"
-            className="min-h-[38px] px-3.5 py-1.5 bg-[#0A0A0A] hover:bg-black/85 text-[#FFFFFF] text-xs font-semibold uppercase tracking-wider font-heading rounded-[2px] inline-flex items-center gap-1.5 transition-transform active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-1"
+            className="min-h-[38px] px-3.5 py-1.5 bg-[#0A0A0A] hover:bg-black/85 text-[#FFFFFF] text-xs font-semibold uppercase tracking-wider font-heading rounded-[2px] inline-flex items-center gap-1.5 transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-2"
           >
             {isCopied ? (
               <>

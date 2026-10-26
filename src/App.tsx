@@ -12,6 +12,8 @@ import { copySynchronously } from './lib/clipboard';
 import { CategoryChips } from './components/CategoryChips';
 import { MessageCard } from './components/MessageCard';
 import { ReviewNotepad } from './components/ReviewNotepad';
+import { StarRatingRow } from './components/StarRatingRow';
+import { PhotoTipCard } from './components/PhotoTipCard';
 import { StickyGoogleBar } from './components/StickyGoogleBar';
 import { ContactButtons } from './components/ContactButtons';
 import { Toast } from './components/Toast';
@@ -29,6 +31,9 @@ export default function App() {
     }
     return siteData.reviewMessages[0]?.id || '';
   });
+
+  // Star Rating state: 0 = none selected on first load
+  const [rating, setRating] = useState<number>(0);
 
   // State for which message is currently copied
   const [copiedMessageText, setCopiedMessageText] = useState<string | null>(null);
@@ -80,8 +85,8 @@ export default function App() {
       {/* Toast Notification */}
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
-      {/* Main Centered Content (Max width 480px, perfect at 360px without horizontal scroll) */}
-      <main className="w-full max-w-[480px] mx-auto px-4 pt-6 pb-28 sm:pb-32 flex flex-col gap-5">
+      {/* Main Centered Content (Max width 480px, 16px section spacing, perfect at 360px without horizontal scroll) */}
+      <main className="w-full max-w-[480px] mx-auto px-4 pt-6 pb-28 sm:pb-32 flex flex-col gap-4">
         {/* 1. Header */}
         <header className="flex flex-col items-center text-center pt-2 pb-1">
           {/* Logo */}
@@ -116,7 +121,10 @@ export default function App() {
           </p>
         </header>
 
-        {/* 2. Editable Review Notepad Box (Placed on the upper side above review options) */}
+        {/* 2. Star Row (Unboxed clean rating row, 36px stars with 8px gaps) */}
+        <StarRatingRow rating={rating} onRatingChange={setRating} />
+
+        {/* 3. Editable Review Notepad Box (Main focus alongside message cards) */}
         <ReviewNotepad
           text={notepadText}
           onChangeText={(newText) => {
@@ -135,7 +143,7 @@ export default function App() {
           onToast={(msg) => setToastMessage(msg)}
         />
 
-        {/* 3. Category Chips (Where all review options names are present) */}
+        {/* 4. Category Chips (Where all review options names are present) */}
         <section aria-label="Review Categories" className="w-full">
           <CategoryChips
             categories={siteData.reviewMessages}
@@ -144,7 +152,7 @@ export default function App() {
           />
         </section>
 
-        {/* 4. Message Cards (4 per category) */}
+        {/* 5. Message Cards (4 per category) */}
         <section
           aria-label="Pre-written review templates"
           className="flex flex-col gap-2.5 w-full"
@@ -165,7 +173,7 @@ export default function App() {
           })}
         </section>
 
-        {/* 5. Link: Prefer to write your own? */}
+        {/* 6. Link: Prefer to write your own? */}
         <div className="text-center pt-1 pb-1">
           <a
             href={googleReviewDirectUrl}
@@ -183,10 +191,13 @@ export default function App() {
           </a>
         </div>
 
-        {/* 6. Stay Connected & Contact Buttons */}
+        {/* 7. Slim Photo Option Row (Placed above the Open Google bar) */}
+        <PhotoTipCard />
+
+        {/* 8. Stay Connected & Contact Buttons */}
         <ContactButtons />
 
-        {/* 7. Footer Notes & Policies */}
+        {/* 9. Footer Notes & Policies */}
         <footer className="mt-4 pt-4 border-t border-[#E5E5E5] text-center flex flex-col items-center gap-2">
           <p className="text-[11px] leading-relaxed text-[#737373] max-w-[360px]">
             Pick only what matches your experience. Honest reviews help everyone.
@@ -200,11 +211,12 @@ export default function App() {
         </footer>
       </main>
 
-      {/* Sticky Bottom Bar (Always visible for everyone) */}
+      {/* Sticky Bottom Bar (Always visible for everyone, with 3-step hint) */}
       <StickyGoogleBar
         isVisible={true}
         hasCopied={Boolean(copiedMessageText || notepadText.trim().length > 0)}
         notepadText={notepadText}
+        rating={rating}
       />
     </div>
   );
