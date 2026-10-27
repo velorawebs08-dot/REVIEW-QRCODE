@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { ExternalLink, Camera } from 'lucide-react';
 import { siteData } from './siteData';
 import { fillTemplate } from './lib/fillTemplate';
@@ -13,7 +13,6 @@ import { joinReviewMessages, formatSingleMessage, getConnectorForIndex } from '.
 import { CategoryChips } from './components/CategoryChips';
 import { MessageCard } from './components/MessageCard';
 import { ReviewNotepad } from './components/ReviewNotepad';
-import { StarRatingRow } from './components/StarRatingRow';
 import { StickyGoogleBar } from './components/StickyGoogleBar';
 import { ContactButtons } from './components/ContactButtons';
 import { Toast } from './components/Toast';
@@ -32,9 +31,6 @@ export default function App() {
     return siteData.reviewMessages[0]?.id || '';
   });
 
-  // Star Rating state: 0 = none selected on first load
-  const [rating, setRating] = useState<number>(0);
-
   // Selected messages list in tap order (up to 4 messages)
   const [selectedMessages, setSelectedMessages] = useState<string[]>([]);
 
@@ -46,6 +42,9 @@ export default function App() {
 
   // Editable Notepad review draft state
   const [notepadText, setNotepadText] = useState<string>('');
+
+  // Ref for the YOUR REVIEW notepad card to check if it is scrolled out of view
+  const notepadContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Sync category changes to localStorage safely
   const handleSelectCategory = (id: string) => {
@@ -104,6 +103,14 @@ export default function App() {
         setNotepadText(newParagraph);
         setToastMessage('Added to your review');
       }
+
+      // Scroll page up slightly only if the notepad card is scrolled above the visible viewport
+      if (notepadContainerRef.current) {
+        const rect = notepadContainerRef.current.getBoundingClientRect();
+        if (rect.top < 10) {
+          notepadContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
   };
 
@@ -121,9 +128,16 @@ export default function App() {
       {/* Toast Notification */}
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
-      {/* Main Centered Content (Max width 480px, 16px section spacing, perfect at 360px without horizontal scroll) */}
-      <main className="w-full max-w-[480px] mx-auto px-4 pt-6 pb-28 sm:pb-32 flex flex-col gap-4">
-        {/* 1. Header */}
+      {/* Main Centered Content:
+          1. Header
+          2. YOUR REVIEW Notepad
+          3. Category Chips
+          4. Message Cards
+          5. Contact Buttons & Footer
+          pb-[148px] ensures a full 56px+ clearance above the fixed bottom bar
+      */}
+      <main className="w-full max-w-[480px] mx-auto px-4 pt-6 pb-[148px] flex flex-col gap-4">
+        {/* 1. Header (Logo + Heading + Small Line) */}
         <header className="flex flex-col items-center text-center pt-2 pb-1">
           {/* Logo */}
           <div className="mb-3.5 flex items-center justify-center">
@@ -151,17 +165,15 @@ export default function App() {
             HOW WAS YOUR EXPERIENCE?
           </h1>
 
-          {/* Subtitle / instruction: Tap ADD */}
+          {/* Subtitle / instruction line: Tap ADD */}
           <p className="text-xs sm:text-[13px] text-[#737373] mt-1 font-normal max-w-[340px]">
             Tap <strong className="text-[#0A0A0A] font-semibold">ADD</strong> on messages that match your visit.
           </p>
         </header>
 
-        {/* 2. Star Row (Unboxed clean rating row, 36px stars with 8px gaps) */}
-        <StarRatingRow rating={rating} onRatingChange={setRating} />
-
-        {/* 3. Editable Review Notepad Box (Main focus alongside message cards) */}
+        {/* 2. "YOUR REVIEW" Notepad Card (Placed right under the heading) */}
         <ReviewNotepad
+          containerRef={notepadContainerRef}
           text={notepadText}
           onChangeText={(newText) => {
             setNotepadText(newText);
@@ -171,7 +183,7 @@ export default function App() {
           onToast={(msg) => setToastMessage(msg)}
         />
 
-        {/* 4. Category Chips (Where all review options names are present) */}
+        {/* 3. Category Chips */}
         <section aria-label="Review Categories" className="w-full">
           <CategoryChips
             categories={siteData.reviewMessages}
@@ -180,7 +192,7 @@ export default function App() {
           />
         </section>
 
-        {/* 5. Message Cards (4 per category) with ADD / ADDED ✓ toggling */}
+        {/* 4. Message Cards (4 per category) with ADD / ADDED ✓ toggling */}
         <section
           aria-label="Pre-written review templates"
           className="flex flex-col gap-2.5 w-full"
@@ -201,8 +213,8 @@ export default function App() {
           })}
         </section>
 
-        {/* 6. Link: Prefer to write your own? */}
-        <div className="text-center pt-1 pb-1">
+        {/* Optional: Prefer to write your own review? */}
+        <div className="text-center pt-0.5 pb-0.5">
           <a
             href={googleReviewDirectUrl}
             target="_blank"
@@ -219,18 +231,18 @@ export default function App() {
           </a>
         </div>
 
-        {/* 7. Photo Tip Line (Placed above the bottom bar) */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-[#737373] text-center px-2 py-1 leading-normal">
+        {/* Optional: Photo Tip Line */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#737373] text-center px-2 py-0.5 leading-normal">
           <Camera className="w-3.5 h-3.5 shrink-0 text-[#737373]" aria-hidden="true" />
           <span>
             Tip: On Google tap &lsquo;Add photos &amp; videos&rsquo; to add a photo of your jersey. Your latest photos appear first.
           </span>
         </div>
 
-        {/* 8. Stay Connected & Contact Buttons */}
+        {/* 5. Stay Connected & Contact Buttons */}
         <ContactButtons />
 
-        {/* 9. Footer Notes & Policies */}
+        {/* Footer Notes & Policies */}
         <footer className="mt-4 pt-4 border-t border-[#E5E5E5] text-center flex flex-col items-center gap-2">
           <p className="text-[11px] leading-relaxed text-[#737373] max-w-[360px]">
             Pick only what matches your experience. Honest reviews help everyone.
@@ -244,12 +256,11 @@ export default function App() {
         </footer>
       </main>
 
-      {/* Sticky Bottom Bar (Always visible for everyone, with COPY & OPEN GOOGLE) */}
+      {/* Fixed Bottom Bar: COPY & OPEN GOOGLE (Always reachable while scrolling) */}
       <StickyGoogleBar
         isVisible={true}
         hasCopied={selectedMessages.length > 0 || notepadText.trim().length > 0}
         notepadText={notepadText}
-        rating={rating}
       />
     </div>
   );

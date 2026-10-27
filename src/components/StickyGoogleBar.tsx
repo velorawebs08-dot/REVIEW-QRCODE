@@ -6,19 +6,15 @@ interface StickyGoogleBarProps {
   isVisible?: boolean;
   hasCopied?: boolean;
   notepadText: string;
-  rating?: number;
 }
 
 export const StickyGoogleBar: React.FC<StickyGoogleBarProps> = ({
   isVisible = true,
   notepadText,
-  rating = 0,
 }) => {
   const reviewUrl = getGoogleReviewUrl();
   const issueWhatsAppUrl = getWhatsAppUrl(
-    rating > 0
-      ? `Hi False Nine, I gave a rating of ${rating} stars and wanted to share my feedback privately.`
-      : `Hi False Nine, I had an issue during my visit and wanted to share my feedback privately.`
+    "Hi False Nine, I had an issue during my visit and wanted to tell you privately."
   );
 
   // Synchronously ensure notepad text is copied on tap without delaying window opening
@@ -28,28 +24,14 @@ export const StickyGoogleBar: React.FC<StickyGoogleBarProps> = ({
     }
   };
 
-  const isLowRating = rating >= 1 && rating <= 3;
-
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#FFFFFF]/95 backdrop-blur-md border-t border-[#E5E5E5] px-4 pt-2.5 pb-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#FFFFFF]/95 backdrop-blur-md border-t border-[#E5E5E5] px-4 pt-2.5 pb-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
       <div className="max-w-[480px] mx-auto w-full flex flex-col gap-1.5">
-        {/* Hint above the bar + WhatsApp link for 1-3 stars */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-[#737373] px-0.5 font-normal leading-tight gap-1">
-          <span className="truncate">
-            Your review is copied. On Google: tap stars, paste, then Post.
-          </span>
-          {isLowRating && (
-            <a
-              href={issueWhatsAppUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 text-[#0A0A0A] font-semibold transition-colors shrink-0 whitespace-nowrap hover:opacity-80"
-            >
-              Tell us privately on WhatsApp
-            </a>
-          )}
+        {/* Step line: Step 1 reads "On Google, tap your stars" (no star icons, no number). Steps 2 and 3: paste the review, tap Post */}
+        <div className="text-center text-[11px] text-[#737373] px-0.5 font-normal leading-tight">
+          <span>On Google, tap your stars &middot; paste the review &middot; tap Post</span>
         </div>
 
         {/* Direct Google Review Anchor: COPY & OPEN GOOGLE */}
@@ -63,6 +45,18 @@ export const StickyGoogleBar: React.FC<StickyGoogleBarProps> = ({
         >
           <span>COPY &amp; OPEN GOOGLE &rarr;</span>
         </a>
+
+        {/* Small gray text link under COPY & OPEN GOOGLE button, always visible */}
+        <div className="text-center">
+          <a
+            href={issueWhatsAppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#737373] hover:text-[#0A0A0A] underline underline-offset-2 transition-colors inline-block py-0.5"
+          >
+            Had an issue? Tell us privately on WhatsApp
+          </a>
+        </div>
       </div>
     </div>
   );

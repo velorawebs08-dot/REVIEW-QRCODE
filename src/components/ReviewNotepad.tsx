@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Copy, Check, Trash2 } from 'lucide-react';
 import { copyToClipboard } from '../lib/clipboard';
 
@@ -7,6 +7,7 @@ interface ReviewNotepadProps {
   onChangeText: (newText: string) => void;
   onClear: () => void;
   onToast: (message: string) => void;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const ReviewNotepad: React.FC<ReviewNotepadProps> = ({
@@ -14,8 +15,19 @@ export const ReviewNotepad: React.FC<ReviewNotepadProps> = ({
   onChangeText,
   onClear,
   onToast,
+  containerRef,
 }) => {
   const [isCopied, setIsCopied] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Automatically grow textarea if text is longer than 4 rows
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.max(105, scrollHeight)}px`;
+    }
+  }, [text]);
 
   const handleCopyReview = async () => {
     if (!text.trim()) {
@@ -32,11 +44,12 @@ export const ReviewNotepad: React.FC<ReviewNotepadProps> = ({
 
   return (
     <section
+      ref={containerRef}
       aria-label="Your editable review"
-      className="w-full bg-[#FFFFFF] border border-[#E5E5E5] p-4 rounded-[2px] transition-all"
+      className="w-full bg-[#FFFFFF] border border-[#E5E5E5] p-3.5 sm:p-4 rounded-[2px] transition-all"
     >
-      {/* Header (No toggle - adding is always cumulative) */}
-      <div className="flex items-center justify-between gap-2 pb-2.5">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2 pb-2">
         <div className="flex items-baseline gap-2">
           <h2 className="text-base sm:text-lg font-bold font-heading uppercase text-[#0A0A0A] tracking-wide">
             YOUR REVIEW
@@ -47,19 +60,20 @@ export const ReviewNotepad: React.FC<ReviewNotepadProps> = ({
         </div>
       </div>
 
-      {/* Textarea */}
+      {/* Textarea (4 rows by default, grows automatically if longer) */}
       <div className="relative">
         <textarea
+          ref={textareaRef}
           rows={4}
           value={text}
           onChange={(e) => onChangeText(e.target.value)}
           placeholder="Tap ADD on messages below, or write your own review here."
-          className="w-full min-h-[110px] p-3 text-[15px] font-sans leading-relaxed text-[#0A0A0A] placeholder:text-[#737373] placeholder:text-sm bg-[#FFFFFF] border border-[#0A0A0A] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-black resize-y"
+          className="w-full min-h-[105px] p-3 text-[15px] font-sans leading-relaxed text-[#0A0A0A] placeholder:text-[#737373] placeholder:text-sm bg-[#FFFFFF] border border-[#0A0A0A] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-black overflow-hidden resize-none transition-[height] duration-150"
         />
       </div>
 
       {/* Footer info & Actions */}
-      <div className="flex items-center justify-between gap-2 pt-2.5">
+      <div className="flex items-center justify-between gap-2 pt-2">
         {/* Live character count */}
         <span className="text-xs text-[#737373] font-mono tabular-nums">
           {text.length} {text.length === 1 ? 'character' : 'characters'}
