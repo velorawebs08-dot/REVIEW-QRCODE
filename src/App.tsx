@@ -4,16 +4,16 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Camera } from 'lucide-react';
 import { siteData } from './siteData';
 import { fillTemplate } from './lib/fillTemplate';
 import { getGoogleReviewUrl } from './lib/links';
 import { copySynchronously } from './lib/clipboard';
+import { joinReviewMessages, formatSingleMessage, getConnectorForIndex } from './lib/joinMessages';
 import { CategoryChips } from './components/CategoryChips';
 import { MessageCard } from './components/MessageCard';
 import { ReviewNotepad } from './components/ReviewNotepad';
 import { StarRatingRow } from './components/StarRatingRow';
-import { PhotoTipCard } from './components/PhotoTipCard';
 import { StickyGoogleBar } from './components/StickyGoogleBar';
 import { ContactButtons } from './components/ContactButtons';
 import { Toast } from './components/Toast';
@@ -35,14 +35,17 @@ export default function App() {
   // Star Rating state: 0 = none selected on first load
   const [rating, setRating] = useState<number>(0);
 
-  // State for which message is currently copied
-  const [copiedMessageText, setCopiedMessageText] = useState<string | null>(null);
-  const [hasCopiedAtLeastOnce, setHasCopiedAtLeastOnce] = useState<boolean>(false);
+  // Selected messages list in tap order (up to 4 messages)
+  const [selectedMessages, setSelectedMessages] = useState<string[]>([]);
+
+  // Track whether customer edited the notepad text manually
+  const [isManuallyEdited, setIsManuallyEdited] = useState<boolean>(false);
+
+  // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Editable Notepad review draft state
   const [notepadText, setNotepadText] = useState<string>('');
-  const [appendToReview, setAppendToReview] = useState<boolean>(false);
 
   // Sync category changes to localStorage safely
   const handleSelectCategory = (id: string) => {
@@ -62,20 +65,53 @@ export default function App() {
     );
   }, [activeCategoryId]);
 
-  // Handle successful copy from message cards
-  const handleCopySuccess = (text: string) => {
-    setCopiedMessageText(text);
-    setHasCopiedAtLeastOnce(true);
-
-    if (appendToReview && notepadText.trim().length > 0) {
-      const combined = `${notepadText.trim()}\n${text}`;
-      setNotepadText(combined);
-      copySynchronously(combined);
+  // Toggle adding or removing a message (cumulative list, max 4)
+  const handleToggleAdd = (message: string) => {
+    if (selectedMessages.includes(message)) {
+      // Tapping an added card removes only that one
+      const nextSelected = selectedMessages.filter((m) => m !== message);
+      setSelectedMessages(nextSelected);
+      setIsManuallyEdited(false);
+      const newParagraph = joinReviewMessages(nextSelected);
+      setNotepadText(newParagraph);
+      setToastMessage('Removed from review');
     } else {
-      setNotepadText(text);
-    }
+      // Maximum 4 messages
+      if (selectedMessages.length >= 4) {
+        setToastMessage('You can add up to 4 messages.');
+        return;
+      }
 
-    setToastMessage('Copied! Now open Google and paste.');
+      // If customer edited by hand, append with connector to their edited text
+      if (isManuallyEdited && notepadText.trim().length > 0) {
+        const connector = getConnectorForIndex(selectedMessages.length);
+        const formattedNew = formatSingleMessage(
+          message,
+          connector,
+          siteData.business.name,
+          siteData.business.city
+        );
+        const currentTrimmed = notepadText.trim().replace(/[.!?]*$/, '') + '.';
+        const combined = `${currentTrimmed} ${formattedNew}`;
+        setSelectedMessages((prev) => [...prev, message]);
+        setNotepadText(combined);
+        setToastMessage('Added to your review');
+      } else {
+        const nextSelected = [...selectedMessages, message];
+        setSelectedMessages(nextSelected);
+        setIsManuallyEdited(false);
+        const newParagraph = joinReviewMessages(nextSelected);
+        setNotepadText(newParagraph);
+        setToastMessage('Added to your review');
+      }
+    }
+  };
+
+  const handleClearNotepad = () => {
+    setNotepadText('');
+    setSelectedMessages([]);
+    setIsManuallyEdited(false);
+    setToastMessage('Review cleared.');
   };
 
   const googleReviewDirectUrl = getGoogleReviewUrl();
@@ -115,9 +151,9 @@ export default function App() {
             HOW WAS YOUR EXPERIENCE?
           </h1>
 
-          {/* Subtitle / instruction */}
+          {/* Subtitle / instruction: Tap ADD */}
           <p className="text-xs sm:text-[13px] text-[#737373] mt-1 font-normal max-w-[340px]">
-            Tap <strong className="text-[#0A0A0A] font-semibold">COPY</strong> on a message that matches your visit.
+            Tap <strong className="text-[#0A0A0A] font-semibold">ADD</strong> on messages that match your visit.
           </p>
         </header>
 
@@ -129,17 +165,9 @@ export default function App() {
           text={notepadText}
           onChangeText={(newText) => {
             setNotepadText(newText);
-            if (newText.trim().length > 0) {
-              setHasCopiedAtLeastOnce(true);
-            }
+            setIsManuallyEdited(true);
           }}
-          onClear={() => {
-            setNotepadText('');
-            setCopiedMessageText(null);
-            setToastMessage('Review draft cleared.');
-          }}
-          appendToReview={appendToReview}
-          onToggleAppend={setAppendToReview}
+          onClear={handleClearNotepad}
           onToast={(msg) => setToastMessage(msg)}
         />
 
@@ -152,22 +180,22 @@ export default function App() {
           />
         </section>
 
-        {/* 5. Message Cards (4 per category) */}
+        {/* 5. Message Cards (4 per category) with ADD / ADDED ✓ toggling */}
         <section
           aria-label="Pre-written review templates"
           className="flex flex-col gap-2.5 w-full"
         >
           {activeCategory?.messages.map((rawMessage, index) => {
             const formattedMessage = fillTemplate(rawMessage);
-            const isCopied = copiedMessageText === formattedMessage;
+            const isAdded = selectedMessages.includes(formattedMessage);
 
             return (
               <MessageCard
                 key={`${activeCategory.id}-${index}`}
                 index={index}
                 message={formattedMessage}
-                isCopied={isCopied}
-                onCopySuccess={handleCopySuccess}
+                isAdded={isAdded}
+                onToggleAdd={handleToggleAdd}
               />
             );
           })}
@@ -191,8 +219,13 @@ export default function App() {
           </a>
         </div>
 
-        {/* 7. Slim Photo Option Row (Placed above the Open Google bar) */}
-        <PhotoTipCard />
+        {/* 7. Photo Tip Line (Placed above the bottom bar) */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#737373] text-center px-2 py-1 leading-normal">
+          <Camera className="w-3.5 h-3.5 shrink-0 text-[#737373]" aria-hidden="true" />
+          <span>
+            Tip: On Google tap &lsquo;Add photos &amp; videos&rsquo; to add a photo of your jersey. Your latest photos appear first.
+          </span>
+        </div>
 
         {/* 8. Stay Connected & Contact Buttons */}
         <ContactButtons />
@@ -211,10 +244,10 @@ export default function App() {
         </footer>
       </main>
 
-      {/* Sticky Bottom Bar (Always visible for everyone, with 3-step hint) */}
+      {/* Sticky Bottom Bar (Always visible for everyone, with COPY & OPEN GOOGLE) */}
       <StickyGoogleBar
         isVisible={true}
-        hasCopied={Boolean(copiedMessageText || notepadText.trim().length > 0)}
+        hasCopied={selectedMessages.length > 0 || notepadText.trim().length > 0}
         notepadText={notepadText}
         rating={rating}
       />
